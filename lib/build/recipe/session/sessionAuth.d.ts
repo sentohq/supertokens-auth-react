@@ -1,21 +1,24 @@
 import React from "react";
-import { FeatureBaseOptionalRidProps } from "../../types";
-import AuthRecipeModule from "../authRecipeModule";
-export default class SessionAuth<T, S, R, N> extends React.PureComponent<FeatureBaseOptionalRidProps & {
-    requireAuth?: boolean;
-}, {
-    status: "LOADING";
-} | {
-    status: "READY";
-    userId: string;
-    doesSessionExist: boolean;
-    jwtPayload: any;
-}> {
-    constructor(props: FeatureBaseOptionalRidProps & {
+export default class SessionAuth extends React.PureComponent<
+    {
         requireAuth?: boolean;
-    });
-    getRecipeInstanceOrThrow: () => AuthRecipeModule<T, S, R, N>;
-    redirectToLogin: () => Promise<void>;
+        redirectToLogin?: () => Promise<void>;
+    },
+    | {
+          status: "LOADING" | "IS_IN_NESTED_SESSION_AUTH";
+      }
+    | {
+          status: "READY";
+          userId: string;
+          doesSessionExist: boolean;
+          jwtPayload: any;
+      }
+> {
+    static contextType: React.Context<import("./types").SessionContextType>;
+    constructor(props: { requireAuth?: boolean; redirectToLogin?: () => Promise<void> });
+    componentDidUpdate(): Promise<void>;
+    handleSessionAuthContextFromParent: () => Promise<void>;
+    subscribeToSessionStateChangesAndCreateContext: () => Promise<void>;
     componentDidMount(): Promise<void>;
     render: () => JSX.Element | null;
 }

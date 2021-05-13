@@ -24,21 +24,23 @@ import { FeatureBaseProps } from "../../types";
 import SessionAuth from "../session/sessionAuth";
 import EmailVerificationAuth from "../emailverification/emailVerificationAuth";
 import SuperTokens from "../../superTokens";
+import { getWindowOrThrow } from "../../utils";
+import AuthRecipeModule from "../authRecipeModule";
+import { isAuthRecipeModule } from "../authRecipeModule/utils";
 
 /*
  * Component.
  */
 
-class ThirdPartyEmailPasswordAuth extends PureComponent<FeatureBaseProps & { requireAuth?: boolean }> {
+class ThirdPartyEmailPasswordAuth<T, S, R, N> extends PureComponent<FeatureBaseProps & { requireAuth?: boolean }> {
     /*
      * Render.
      */
     render = (): JSX.Element | null => {
         return (
             <SessionAuth
-                requireAuth={this.props.requireAuth === undefined || this.props.requireAuth}
-                recipeId={ThirdPartyEmailPassword.getInstanceOrThrow().recipeId}
-                history={this.props.history}>
+                redirectToLogin={this.redirectToLogin}
+                requireAuth={this.props.requireAuth === undefined || this.props.requireAuth}>
                 <EmailVerificationAuth
                     recipeId={ThirdPartyEmailPassword.getInstanceOrThrow().recipeId}
                     history={this.props.history}>
@@ -47,21 +49,51 @@ class ThirdPartyEmailPasswordAuth extends PureComponent<FeatureBaseProps & { req
             </SessionAuth>
         );
     };
+
+    getRecipeInstanceOrThrow = (): AuthRecipeModule<T, S, R, N> => {
+        if (this.props.recipeId === undefined) {
+            throw new Error("No recipeId props given to ThirdPartyEmailPasswordAuth component");
+        }
+
+        const recipe = SuperTokens.getInstanceOrThrow().getRecipeOrThrow(this.props.recipeId);
+        if (isAuthRecipeModule<T, S, R, N>(recipe)) {
+            return recipe;
+        }
+
+        throw new Error(
+            `${recipe.recipeId} must be an instance of AuthRecipeModule to use ThirdPartyEmailPasswordAuth component.`
+        );
+    };
+
+    redirectToLogin = async (): Promise<void> => {
+        const redirectToPath = getWindowOrThrow().location.pathname;
+        await this.getRecipeInstanceOrThrow().redirect(
+            { action: "SIGN_IN_AND_UP" } as unknown as T,
+            this.props.history,
+            {
+                redirectToPath,
+            }
+        );
+    };
 }
 
 export default function ThirdPartyAuthWrapper({
     children,
     requireAuth,
+    recipeId,
 }: {
     children: JSX.Element;
     requireAuth?: boolean;
+    recipeId?: any;
 }): JSX.Element {
+    if (recipeId === undefined) {
+        recipeId = ThirdPartyEmailPassword.getInstanceOrThrow().recipeId;
+    }
+
     const reactRouterDom = SuperTokens.getInstanceOrThrow().getReactRouterDom();
     if (reactRouterDom === undefined) {
         return (
-            <ThirdPartyEmailPasswordAuth
-                requireAuth={requireAuth}
-                recipeId={ThirdPartyEmailPassword.getInstanceOrThrow().recipeId}>
+            <ThirdPartyEmailPasswordAuth requireAuth={requireAuth} recipeId={recipeId}>
                 {children}
             </ThirdPartyEmailPasswordAuth>
         );
@@ -69,7 +101,7 @@ export default function ThirdPartyAuthWrapper({
 
     const Component = reactRouterDom.withRouter(ThirdPartyEmailPasswordAuth);
     return (
-        <Component requireAuth={requireAuth} recipeId={ThirdPartyEmailPassword.getInstanceOrThrow().recipeId}>
+        <Component requireAuth={requireAuth} recipeId={recipeId}>
             {children}
         </Component>
     );

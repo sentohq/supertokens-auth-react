@@ -17,24 +17,19 @@
  * Imports.
  */
 import React from "react";
-
-import { getWindowOrThrow } from "supertokens-website/lib/build/utils";
-import { FeatureBaseOptionalRidProps } from "../../types";
-import AuthRecipeModule from "../authRecipeModule";
-import SuperTokens from "../../superTokens";
-import { isAuthRecipeModule } from "../authRecipeModule/utils";
-import SessionContext from "./sessionContext";
+import SessionContext, { isDefaultSessionContext } from "./sessionContext";
 import { getUserId, getJWTPayloadSecurely, doesSessionExist } from "./";
 
 /*
  * Component.
  */
 
-export default class SessionAuth<T, S, R, N> extends React.PureComponent<
-    FeatureBaseOptionalRidProps & {
+export default class SessionAuth extends React.PureComponent<
+    {
         requireAuth?: boolean; // false by default
+        redirectToLogin?: () => Promise<void>;
     },
-    | { status: "LOADING" }
+    | { status: "LOADING" | "IS_IN_NESTED_SESSION_AUTH" }
     | {
           status: "READY";
           userId: string;
@@ -42,44 +37,46 @@ export default class SessionAuth<T, S, R, N> extends React.PureComponent<
           jwtPayload: any;
       }
 > {
+    static contextType = SessionContext;
     /*
      * Constructor.
      */
-    constructor(props: FeatureBaseOptionalRidProps & { requireAuth?: boolean }) {
+    constructor(props: { requireAuth?: boolean; redirectToLogin?: () => Promise<void> }) {
         super(props);
         this.state = {
             status: "LOADING",
         };
     }
 
-    /*
-     * Methods.
-     */
-    getRecipeInstanceOrThrow = (): AuthRecipeModule<T, S, R, N> => {
-        if (this.props.recipeId === undefined) {
-            throw new Error("No recipeId props given to SessionAuth component");
+    async componentDidUpdate() {
+        // TODO: check if this is called when the context / prop is updated or not..
+        if (!isDefaultSessionContext(this.context)) {
+            await this.handleSessionAuthContextFromParent();
         }
+    }
 
-        const recipe = SuperTokens.getInstanceOrThrow().getRecipeOrThrow(this.props.recipeId);
-        if (isAuthRecipeModule<T, S, R, N>(recipe)) {
-            return recipe;
-        }
-
-        throw new Error(`${recipe.recipeId} must be an instance of AuthRecipeModule to use SessionAuth component.`);
-    };
-
-    redirectToLogin = async (): Promise<void> => {
-        const redirectToPath = getWindowOrThrow().location.pathname;
-        await this.getRecipeInstanceOrThrow().redirect(
-            { action: "SIGN_IN_AND_UP" } as unknown as T,
-            this.props.history,
-            {
-                redirectToPath,
+    handleSessionAuthContextFromParent = async () => {
+        // this means that we are in a nested SessionAuth wrapper
+        if (this.props.requireAuth === true && !this.context.doesSessionExist) {
+            if (this.props.redirectToLogin === undefined) {
+                throw new Error(
+                    "When using SessionAuth with requireAuth=true, please provide the redirectToLogin prop as well."
+                );
             }
-        );
+            return await this.props.redirectToLogin();
+        }
+        this.setState((oldState) => {
+            if (oldState.status === "IS_IN_NESTED_SESSION_AUTH") {
+                return oldState;
+            }
+            return {
+                ...oldState,
+                status: "IS_IN_NESTED_SESSION_AUTH",
+            };
+        });
     };
 
-    async componentDidMount(): Promise<void> {
+    subscribeToSessionStateChangesAndCreateContext = async () => {
         const sessionExists = await doesSessionExist();
         if (sessionExists === false) {
             if (this.props.requireAuth !== true) {
@@ -93,7 +90,12 @@ export default class SessionAuth<T, S, R, N> extends React.PureComponent<
                     };
                 });
             } else {
-                return await this.redirectToLogin();
+                if (this.props.redirectToLogin === undefined) {
+                    throw new Error(
+                        "When using SessionAuth with requireAuth=true, please provide the redirectToLogin prop as well."
+                    );
+                }
+                return await this.props.redirectToLogin();
             }
         } else {
             const userIdPromise = getUserId();
@@ -114,6 +116,17 @@ export default class SessionAuth<T, S, R, N> extends React.PureComponent<
                 };
             });
         }
+    };
+
+    async componentDidMount(): Promise<void> {
+        if (!isDefaultSessionContext(this.context)) {
+            // since this is not the default session context, it means that
+            // there is a parent SessionAuth somewhere, and that we should let them
+            // handle all the context creation and management.
+            await this.handleSessionAuthContextFromParent();
+        } else {
+            await this.subscribeToSessionStateChangesAndCreateContext();
+        }
     }
 
     /*
@@ -131,6 +144,8 @@ export default class SessionAuth<T, S, R, N> extends React.PureComponent<
                     {this.props.children}
                 </SessionContext.Provider>
             );
+        } else if (this.state.status === "IS_IN_NESTED_SESSION_AUTH") {
+            return <>{this.props.children}</>;
         }
         return null;
     };

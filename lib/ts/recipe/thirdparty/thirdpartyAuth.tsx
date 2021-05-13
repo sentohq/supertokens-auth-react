@@ -24,25 +24,51 @@ import { FeatureBaseProps } from "../../types";
 import SessionAuth from "../session/sessionAuth";
 import EmailVerificationAuth from "../emailverification/emailVerificationAuth";
 import SuperTokens from "../../superTokens";
+import { getWindowOrThrow } from "../../utils";
+import AuthRecipeModule from "../authRecipeModule";
+import { isAuthRecipeModule } from "../authRecipeModule/utils";
 
 /*
  * Component.
  */
 
-class ThirdPartyAuth extends PureComponent<FeatureBaseProps & { requireAuth?: boolean }> {
+class ThirdPartyAuth<T, S, R, N> extends PureComponent<FeatureBaseProps & { requireAuth?: boolean }> {
     /*
      * Render.
      */
     render = (): JSX.Element | null => {
         return (
             <SessionAuth
-                requireAuth={this.props.requireAuth === undefined || this.props.requireAuth}
-                recipeId={ThirdParty.getInstanceOrThrow().recipeId}
-                history={this.props.history}>
+                redirectToLogin={this.redirectToLogin}
+                requireAuth={this.props.requireAuth === undefined || this.props.requireAuth}>
                 <EmailVerificationAuth recipeId={ThirdParty.getInstanceOrThrow().recipeId} history={this.props.history}>
                     {this.props.children}
                 </EmailVerificationAuth>
             </SessionAuth>
+        );
+    };
+
+    getRecipeInstanceOrThrow = (): AuthRecipeModule<T, S, R, N> => {
+        if (this.props.recipeId === undefined) {
+            throw new Error("No recipeId props given to ThirdPartyAuth component");
+        }
+
+        const recipe = SuperTokens.getInstanceOrThrow().getRecipeOrThrow(this.props.recipeId);
+        if (isAuthRecipeModule<T, S, R, N>(recipe)) {
+            return recipe;
+        }
+
+        throw new Error(`${recipe.recipeId} must be an instance of AuthRecipeModule to use ThirdPartyAuth component.`);
+    };
+
+    redirectToLogin = async (): Promise<void> => {
+        const redirectToPath = getWindowOrThrow().location.pathname;
+        await this.getRecipeInstanceOrThrow().redirect(
+            { action: "SIGN_IN_AND_UP" } as unknown as T,
+            this.props.history,
+            {
+                redirectToPath,
+            }
         );
     };
 }
@@ -50,14 +76,20 @@ class ThirdPartyAuth extends PureComponent<FeatureBaseProps & { requireAuth?: bo
 export default function ThirdPartyAuthWrapper({
     children,
     requireAuth,
+    recipeId,
 }: {
     children: JSX.Element;
     requireAuth?: boolean;
+    recipeId?: any;
 }): JSX.Element {
+    if (recipeId === undefined) {
+        recipeId = ThirdParty.getInstanceOrThrow().recipeId;
+    }
+
     const reactRouterDom = SuperTokens.getInstanceOrThrow().getReactRouterDom();
     if (reactRouterDom === undefined) {
         return (
-            <ThirdPartyAuth requireAuth={requireAuth} recipeId={ThirdParty.getInstanceOrThrow().recipeId}>
+            <ThirdPartyAuth requireAuth={requireAuth} recipeId={recipeId}>
                 {children}
             </ThirdPartyAuth>
         );
@@ -65,7 +97,7 @@ export default function ThirdPartyAuthWrapper({
 
     const Component = reactRouterDom.withRouter(ThirdPartyAuth);
     return (
-        <Component requireAuth={requireAuth} recipeId={ThirdParty.getInstanceOrThrow().recipeId}>
+        <Component requireAuth={requireAuth} recipeId={recipeId}>
             {children}
         </Component>
     );

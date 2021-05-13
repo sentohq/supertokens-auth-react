@@ -24,21 +24,23 @@ import { FeatureBaseProps } from "../../../types";
 import SessionAuth from "../../session/sessionAuth";
 import EmailVerificationAuth from "../../emailverification/emailVerificationAuth";
 import SuperTokens from "../../../superTokens";
+import { getWindowOrThrow } from "../../../utils";
+import AuthRecipeModule from "../../authRecipeModule";
+import { isAuthRecipeModule } from "../../authRecipeModule/utils";
 
 /*
  * Component.
  */
 
-class EmailPasswordAuth extends PureComponent<FeatureBaseProps & { requireAuth?: boolean }> {
+class EmailPasswordAuth<T, S, R, N> extends PureComponent<FeatureBaseProps & { requireAuth?: boolean }> {
     /*
      * Render.
      */
     render = (): JSX.Element | null => {
         return (
             <SessionAuth
-                requireAuth={this.props.requireAuth === undefined || this.props.requireAuth}
-                recipeId={EmailPassword.getInstanceOrThrow().recipeId}
-                history={this.props.history}>
+                redirectToLogin={this.redirectToLogin}
+                requireAuth={this.props.requireAuth === undefined || this.props.requireAuth}>
                 <EmailVerificationAuth
                     recipeId={EmailPassword.getInstanceOrThrow().recipeId}
                     history={this.props.history}>
@@ -47,19 +49,51 @@ class EmailPasswordAuth extends PureComponent<FeatureBaseProps & { requireAuth?:
             </SessionAuth>
         );
     };
+
+    getRecipeInstanceOrThrow = (): AuthRecipeModule<T, S, R, N> => {
+        if (this.props.recipeId === undefined) {
+            throw new Error("No recipeId props given to EmailPasswordAuth component");
+        }
+
+        const recipe = SuperTokens.getInstanceOrThrow().getRecipeOrThrow(this.props.recipeId);
+        if (isAuthRecipeModule<T, S, R, N>(recipe)) {
+            return recipe;
+        }
+
+        throw new Error(
+            `${recipe.recipeId} must be an instance of AuthRecipeModule to use EmailPasswordAuth component.`
+        );
+    };
+
+    redirectToLogin = async (): Promise<void> => {
+        const redirectToPath = getWindowOrThrow().location.pathname;
+        await this.getRecipeInstanceOrThrow().redirect(
+            { action: "SIGN_IN_AND_UP" } as unknown as T,
+            this.props.history,
+            {
+                redirectToPath,
+            }
+        );
+    };
 }
 
 export default function EmailPasswordAuthWrapper({
     children,
     requireAuth,
+    recipeId,
 }: {
     children: JSX.Element;
     requireAuth?: boolean;
+    recipeId?: any;
 }): JSX.Element {
+    if (recipeId === undefined) {
+        recipeId = EmailPassword.getInstanceOrThrow().recipeId;
+    }
+
     const reactRouterDom = SuperTokens.getInstanceOrThrow().getReactRouterDom();
     if (reactRouterDom === undefined) {
         return (
-            <EmailPasswordAuth requireAuth={requireAuth} recipeId={EmailPassword.getInstanceOrThrow().recipeId}>
+            <EmailPasswordAuth requireAuth={requireAuth} recipeId={recipeId}>
                 {children}
             </EmailPasswordAuth>
         );
@@ -67,7 +101,7 @@ export default function EmailPasswordAuthWrapper({
 
     const Component = reactRouterDom.withRouter(EmailPasswordAuth);
     return (
-        <Component requireAuth={requireAuth} recipeId={EmailPassword.getInstanceOrThrow().recipeId}>
+        <Component requireAuth={requireAuth} recipeId={recipeId}>
             {children}
         </Component>
     );

@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
+## [Unreleased]
+
+-   Allows for Auth wrappers to be nested inside each other
+-   Adds prop to `SessionAuth` to accept a callback for `redirectToLogin`
+-   TODO:
+    -   Basic testing of current setup (nothing old broke)
+    -   Add each type of auth inside each other and see what happens
+    -   Wrap App with an auth wrapper with requireAuth true and see if it breaks..? - shouldn't since routing should not be done via react-router-dom.. Just regular
+        -   What if we create a render function which has init of react-router-dom, and an auth wrapper wraps that with requireAuth true? Then will it use router or no?
+
 ## [0.13.0] - 2021-05-11
 
 ### Added:
