@@ -30,7 +30,7 @@ export async function defaultEmailValidator(value: any): Promise<string | undefi
     // Regex from https://stackoverflow.com/a/46181/3867175
 
     if (value.match(defaultEmailValidatorRegexp) === null) {
-        return "Email is invalid";
+        return "Email ist nicht valide";
     }
 
     return undefined;
@@ -52,19 +52,19 @@ export async function defaultPasswordValidator(value: any): Promise<string | und
     // as per https://github.com/supertokens/supertokens-auth-react/issues/5#issuecomment-709512438
 
     if (value.length < 8) {
-        return "Password must contain at least 8 characters, including a number";
+        return "Das Passwort muss mindestens 8 Zeichen lang sein und eine Zahl enthalten";
     }
 
     if (value.length >= 100) {
-        return "Password's length must be lesser than 100 characters";
+        return "Das Passwort darf nicht länger als 100 Zeichen sein";
     }
 
     if (value.match(/^.*[A-Za-z]+.*$/) === null) {
-        return "Password must contain at least one alphabet";
+        return "Das Passwort muss mindestens einen Buchstaben enthalten";
     }
 
     if (value.match(/^.*[0-9]+.*$/) === null) {
-        return "Password must contain at least one number";
+        return "Das Passwort muss mindestens eine Zahl enthalten";
     }
 
     return undefined;
