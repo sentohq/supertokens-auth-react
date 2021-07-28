@@ -39,7 +39,7 @@ export default class RecipeImplementation implements RecipeInterface {
                 formFields: [
                     {
                         id: input.formFields[1].id,
-                        error: "Confirmation password doesn't match",
+                        error: "Die angegebenen Passwörter stimmen nicht überein",
                     },
                 ],
             };
