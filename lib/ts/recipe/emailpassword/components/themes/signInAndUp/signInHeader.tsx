@@ -26,7 +26,7 @@ export const SignInHeader = withOverride(
         return (
             <Fragment>
                 <div data-supertokens="headerTitle" css={styles.headerTitle}>
-                    Sign In
+                    Anmelden
                 </div>
                 <div data-supertokens="headerSubtitle" css={styles.headerSubtitle}>
                     <div data-supertokens="secondaryText" css={styles.secondaryText}>

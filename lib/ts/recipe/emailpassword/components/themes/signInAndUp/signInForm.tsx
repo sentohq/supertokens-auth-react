@@ -39,7 +39,7 @@ export const SignInForm = withOverride(
         return (
             <FormBase
                 formFields={props.formFields}
-                buttonLabel={"SIGN IN"}
+                buttonLabel={"Anmelden"}
                 onSuccess={props.onSuccess}
                 callAPI={async (formFields) => {
                     const response = await props.recipeImplementation.signIn({
@@ -49,7 +49,7 @@ export const SignInForm = withOverride(
                     if (response.status === "WRONG_CREDENTIALS_ERROR") {
                         return {
                             status: "GENERAL_ERROR",
-                            message: "Incorrect email and password combination",
+                            message: "Die eingegebene Email existiert nicht oder das falsche Passwort wurde angegeben",
                         };
                     } else {
                         return response;
