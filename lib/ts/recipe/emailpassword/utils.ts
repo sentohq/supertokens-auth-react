@@ -187,7 +187,7 @@ function getDefaultEmailFormField(): NormalisedFormField {
     return {
         id: "email",
         label: "Email",
-        placeholder: "Email address",
+        placeholder: "Email",
         validate: defaultEmailValidator,
         optional: false,
         autoComplete: "email",
@@ -197,8 +197,8 @@ function getDefaultEmailFormField(): NormalisedFormField {
 function getDefaultPasswordFormField(): NormalisedFormField {
     return {
         id: "password",
-        label: "Password",
-        placeholder: "Password",
+        label: "Passwort",
+        placeholder: "Passwort",
         validate: defaultPasswordValidator,
         optional: false,
         autoComplete: "new-password",
@@ -226,16 +226,16 @@ export function normaliseResetPasswordUsingTokenFeature(
         formFields: [
             {
                 id: "password",
-                label: "New password",
-                placeholder: "New password",
+                label: "Neues Passwort",
+                placeholder: "Neues Passwort",
                 validate: signUpPasswordFieldValidate,
                 optional: false,
                 autoComplete: "new-password",
             },
             {
                 id: "confirm-password",
-                label: "Confirm password",
-                placeholder: "Confirm your password",
+                label: "Passwort bestätigen",
+                placeholder: "Passwort bestätigen",
                 validate: signUpPasswordFieldValidate,
                 optional: false,
                 autoComplete: "new-password",
@@ -326,7 +326,7 @@ export function getFormattedFormField(field: NormalisedFormField): NormalisedFor
         validate: async (value: any): Promise<string | undefined> => {
             // Absent or not optional empty field
             if (value === "" && field.optional === false) {
-                return "Field is not optional";
+                return "Feld ist nicht optional";
             }
 
             return await field.validate(value);

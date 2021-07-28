@@ -59,21 +59,21 @@ class EmailPasswordSubmitNewPassword extends PureComponent<SubmitNewPasswordProp
                 <div data-supertokens="container" css={styles.container}>
                     <div data-supertokens="row" css={styles.row}>
                         <div data-supertokens="headerTitle" css={styles.headerTitle}>
-                            Success!
+                            Passwort erfolgreich gesetzt!
                         </div>
                         <FormRow key="form-button">
                             <Fragment>
                                 <div
                                     data-supertokens="primaryText submitNewPasswordSuccessMessage"
                                     css={[styles.primaryText, styles.submitNewPasswordSuccessMessage]}>
-                                    Your password has been updated successfully
+                                    Ihr Passwort wurde erfolgreich aktualisiert
                                 </div>
                                 <Button
                                     disabled={false}
                                     isLoading={false}
                                     type="button"
                                     onClick={onSignInClicked}
-                                    label={"SIGN IN"}
+                                    label={"Anmelden"}
                                 />
                             </Fragment>
                         </FormRow>
@@ -87,7 +87,7 @@ class EmailPasswordSubmitNewPassword extends PureComponent<SubmitNewPasswordProp
                 <div data-supertokens="row" css={styles.row}>
                     <FormBase
                         formFields={formFields}
-                        buttonLabel={"Change password"}
+                        buttonLabel={"Passwort ändern"}
                         onSuccess={this.onSuccess}
                         validateOnBlur={true}
                         callAPI={async (fields) => {
@@ -99,7 +99,7 @@ class EmailPasswordSubmitNewPassword extends PureComponent<SubmitNewPasswordProp
                             if (response.status === "RESET_PASSWORD_INVALID_TOKEN_ERROR") {
                                 return {
                                     status: "GENERAL_ERROR",
-                                    message: "Invalid password reset token",
+                                    message: "Passwort konnte nicht gesetzt werden - wenden Sie sich an Ihren Administrator.",
                                 };
                             }
                             return response.status === "FIELD_ERROR"
@@ -112,11 +112,11 @@ class EmailPasswordSubmitNewPassword extends PureComponent<SubmitNewPasswordProp
                         header={
                             <Fragment>
                                 <div data-supertokens="headerTitle" css={styles.headerTitle}>
-                                    Change your password
+                                    Neues Passwort setzen
                                 </div>
                                 <div data-supertokens="headerSubtitle" css={styles.headerSubtitle}>
                                     <div data-supertokens="secondaryText" css={styles.secondaryText}>
-                                        Enter a new password below to change your password
+                                        Setzen Sie hier Ihr Passwort
                                     </div>
                                 </div>
                             </Fragment>

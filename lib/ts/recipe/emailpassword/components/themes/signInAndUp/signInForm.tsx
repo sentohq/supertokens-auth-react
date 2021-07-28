@@ -49,7 +49,7 @@ export const SignInForm = withOverride(
                     if (response.status === "WRONG_CREDENTIALS_ERROR") {
                         return {
                             status: "GENERAL_ERROR",
-                            message: "Die eingegebene Email existiert nicht oder das falsche Passwort wurde angegeben",
+                            message: "Die eingegebene Email existiert nicht oder ein falsches Passwort wurde angegeben",
                         };
                     } else {
                         return response;
