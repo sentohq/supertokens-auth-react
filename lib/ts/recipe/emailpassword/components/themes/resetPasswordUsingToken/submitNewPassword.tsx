@@ -99,7 +99,8 @@ class EmailPasswordSubmitNewPassword extends PureComponent<SubmitNewPasswordProp
                             if (response.status === "RESET_PASSWORD_INVALID_TOKEN_ERROR") {
                                 return {
                                     status: "GENERAL_ERROR",
-                                    message: "Passwort konnte nicht gesetzt werden - wenden Sie sich an Ihren Administrator.",
+                                    message:
+                                        "Passwort konnte nicht gesetzt werden - wenden Sie sich an Ihren Administrator.",
                                 };
                             }
                             return response.status === "FIELD_ERROR"
