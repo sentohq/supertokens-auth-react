@@ -68,9 +68,10 @@ class EmailPasswordResetPasswordEmail extends PureComponent<EnterEmailProps, Ent
                         <div
                             data-supertokens="primaryText enterEmailSuccessMessage"
                             css={[styles.primaryText, styles.enterEmailSuccessMessage]}>
-                            Please check your email for the password recovery link.{" "}
+                            Bitte überprüfen Sie Ihre E-mail und klicken Sie auf den Link zum zurücksetzen Ihres
+                            Passworts.{" "}
                             <span data-supertokens="link" css={styles.link} onClick={this.resend}>
-                                Resend
+                                Nochmal senden
                             </span>
                         </div>
                     </div>
@@ -84,7 +85,7 @@ class EmailPasswordResetPasswordEmail extends PureComponent<EnterEmailProps, Ent
                 <div data-supertokens="row" css={styles.row}>
                     <FormBase
                         formFields={formFields}
-                        buttonLabel={"Email me"}
+                        buttonLabel={"Passwort zurücksetzen"}
                         onSuccess={this.onSuccess}
                         callAPI={async (formFields) =>
                             await this.props.recipeImplementation.sendPasswordResetEmail({
@@ -97,11 +98,12 @@ class EmailPasswordResetPasswordEmail extends PureComponent<EnterEmailProps, Ent
                         header={
                             <Fragment>
                                 <div data-supertokens="headerTitle" css={styles.headerTitle}>
-                                    Reset your password
+                                    Passwort zurücksetzen
                                 </div>
                                 <div data-supertokens="headerSubtitle" css={styles.headerSubtitle}>
                                     <div data-supertokens="secondaryText" css={styles.secondaryText}>
-                                        We will send you an email to reset your password
+                                        Wir senden Ihnen einen Link zum zurücksetzen Ihres Passworts die angegebene
+                                        E-mail
                                     </div>
                                 </div>
                             </Fragment>

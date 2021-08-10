@@ -87,7 +87,7 @@ class EmailPasswordSubmitNewPassword extends PureComponent<SubmitNewPasswordProp
                 <div data-supertokens="row" css={styles.row}>
                     <FormBase
                         formFields={formFields}
-                        buttonLabel={"Passwort ändern"}
+                        buttonLabel={"Passwort setzen"}
                         onSuccess={this.onSuccess}
                         validateOnBlur={true}
                         callAPI={async (fields) => {

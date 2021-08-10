@@ -28,7 +28,7 @@ export const SignInFooter = withOverride(
                 data-supertokens="link secondaryText forgotPasswordLink"
                 css={[styles.link, styles.secondaryText, styles.forgotPasswordLink]}
                 onClick={onClick}>
-                Forgot password?
+                Passwort vergessen?
             </div>
         );
     }
