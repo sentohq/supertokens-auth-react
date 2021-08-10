@@ -100,7 +100,7 @@ class EmailPasswordSubmitNewPassword extends PureComponent<SubmitNewPasswordProp
                                 return {
                                     status: "GENERAL_ERROR",
                                     message:
-                                        "Passwort konnte nicht gesetzt werden - wenden Sie sich an Ihren Administrator.",
+                                        "Ihr Passwort konnte nicht gesetzt werden - bitte nutzen Sie die 'Passwort vergessen?' Funktion um Ihr Passwort erneut zurückzusetzen.",
                                 };
                             }
                             return response.status === "FIELD_ERROR"
@@ -121,6 +121,14 @@ class EmailPasswordSubmitNewPassword extends PureComponent<SubmitNewPasswordProp
                                     </div>
                                 </div>
                             </Fragment>
+                        }
+                        footer={
+                            <a
+                                data-supertokens="link secondaryText forgotPasswordLink"
+                                css={[styles.link, styles.secondaryText, styles.forgotPasswordLink]}
+                                href="/auth/reset-password">
+                                Passwort vergessen?
+                            </a>
                         }
                     />
                 </div>

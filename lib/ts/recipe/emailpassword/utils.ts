@@ -186,8 +186,8 @@ export function getDefaultFormFields(): NormalisedFormField[] {
 function getDefaultEmailFormField(): NormalisedFormField {
     return {
         id: "email",
-        label: "Email",
-        placeholder: "Email",
+        label: "E-mail",
+        placeholder: "E-mail",
         validate: defaultEmailValidator,
         optional: false,
         autoComplete: "email",

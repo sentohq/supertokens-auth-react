@@ -102,7 +102,7 @@ class EmailPasswordResetPasswordEmail extends PureComponent<EnterEmailProps, Ent
                                 </div>
                                 <div data-supertokens="headerSubtitle" css={styles.headerSubtitle}>
                                     <div data-supertokens="secondaryText" css={styles.secondaryText}>
-                                        Wir senden Ihnen einen Link zum zurücksetzen Ihres Passworts die angegebene
+                                        Wir senden Ihnen einen Link zum zurücksetzen Ihres Passworts an die angegebene
                                         E-mail
                                     </div>
                                 </div>
