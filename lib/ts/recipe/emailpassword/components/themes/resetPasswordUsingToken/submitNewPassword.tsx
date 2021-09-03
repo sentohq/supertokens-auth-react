@@ -100,7 +100,7 @@ class EmailPasswordSubmitNewPassword extends PureComponent<SubmitNewPasswordProp
                                 return {
                                     status: "GENERAL_ERROR",
                                     message:
-                                        "Ihr Link zum zurücksetzen Ihres Passworts ist abgelaufen, bitte fordern Sie unten einen neuen Link an um Ihr Passwort zurückzusetzen.",
+                                        "Der Link zum Setzen Ihres Passworts ist abgelaufen. Bitte klicken Sie auf \"neuen Link anfordern\" um einen neuen Link anzufordern.",
                                 };
                             }
                             return response.status === "FIELD_ERROR"
